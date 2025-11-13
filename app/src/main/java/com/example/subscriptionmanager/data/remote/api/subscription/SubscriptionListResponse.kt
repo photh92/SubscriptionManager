@@ -1,6 +1,6 @@
-package com.example.subscriptionmanager.data.remote.api
+package com.example.subscriptionmanager.data.remote.api.subscription
 
-import SubscriptionDto
+import com.example.subscriptionmanager.data.remote.dto.subscription.SubscriptionDto
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 

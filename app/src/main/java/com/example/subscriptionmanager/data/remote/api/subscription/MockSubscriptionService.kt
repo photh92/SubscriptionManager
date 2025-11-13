@@ -1,7 +1,7 @@
-package com.example.subscriptionmanager.data.remote.api
+package com.example.subscriptionmanager.data.remote.api.subscription
 
 import IdGenerator
-import SubscriptionDto
+import com.example.subscriptionmanager.data.remote.dto.subscription.SubscriptionDto
 import kotlinx.coroutines.delay
 import java.time.Instant
 import java.time.LocalDate

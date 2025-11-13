@@ -1,6 +1,6 @@
-package com.example.subscriptionmanager.data.remote.api
+package com.example.subscriptionmanager.data.remote.api.subscription
 
-import SubscriptionDto
+import com.example.subscriptionmanager.data.remote.dto.subscription.SubscriptionDto
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
