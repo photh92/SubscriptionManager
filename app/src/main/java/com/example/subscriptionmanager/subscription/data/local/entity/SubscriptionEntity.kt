@@ -1,4 +1,4 @@
-package com.example.subscriptionmanager.data.local.entity.subscription
+package com.example.subscriptionmanager.subscription.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

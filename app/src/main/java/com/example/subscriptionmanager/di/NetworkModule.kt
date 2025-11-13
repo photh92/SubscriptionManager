@@ -1,7 +1,7 @@
 package com.example.subscriptionmanager.di
 
-import com.example.subscriptionmanager.data.remote.api.subscription.MockSubscriptionService
-import com.example.subscriptionmanager.data.remote.api.subscription.SubscriptionApi
+import com.example.subscriptionmanager.subscription.data.remote.api.MockSubscriptionService
+import com.example.subscriptionmanager.subscription.data.remote.api.SubscriptionApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

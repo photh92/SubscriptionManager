@@ -2,8 +2,8 @@ package com.example.subscriptionmanager.di
 
 import android.app.Application
 import androidx.room.Room
-import com.example.subscriptionmanager.data.local.AppDatabase
-import com.example.subscriptionmanager.data.local.dao.subscription.SubscriptionDao
+import com.example.subscriptionmanager.subscription.data.local.AppDatabase
+import com.example.subscriptionmanager.subscription.data.local.dao.SubscriptionDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

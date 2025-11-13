@@ -1,11 +1,11 @@
-package com.example.subscriptionmanager.data.local.dao.subscription
+package com.example.subscriptionmanager.subscription.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.subscriptionmanager.data.local.entity.subscription.SubscriptionEntity
+import com.example.subscriptionmanager.subscription.data.local.entity.SubscriptionEntity
 import kotlinx.coroutines.flow.Flow
 
 /**

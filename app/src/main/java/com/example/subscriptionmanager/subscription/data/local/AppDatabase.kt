@@ -1,9 +1,9 @@
-package com.example.subscriptionmanager.data.local
+package com.example.subscriptionmanager.subscription.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.example.subscriptionmanager.data.local.dao.subscription.SubscriptionDao
-import com.example.subscriptionmanager.data.local.entity.subscription.SubscriptionEntity
+import com.example.subscriptionmanager.subscription.data.local.dao.SubscriptionDao
+import com.example.subscriptionmanager.subscription.data.local.entity.SubscriptionEntity
 
 /**
  * Room Database 인스턴스를 정의하는 추상 클래스.
