@@ -1,5 +1,7 @@
-import com.example.subscriptionmanager.data.remote.api.`MockSubscriptionService.kt`
-import com.example.subscriptionmanager.data.remote.api.`SubscriptionApi.kt`
+package com.example.subscriptionmanager.di
+
+import com.example.subscriptionmanager.data.remote.api.subscription.MockSubscriptionService
+import com.example.subscriptionmanager.data.remote.api.subscription.SubscriptionApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,14 +36,14 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideApiService(retrofit: Retrofit): `SubscriptionApi.kt` =
-        retrofit.create(`SubscriptionApi.kt`::class.java)
+    fun provideApiService(retrofit: Retrofit): SubscriptionApi =
+        retrofit.create(SubscriptionApi::class.java)
 
     // MockAPI
     @Provides
     @Singleton
     // 이제 MockService를 SubscriptionApi 타입으로 제공
-    fun provideSubscriptionApi(): `SubscriptionApi.kt` {
-        return `MockSubscriptionService.kt`()
+    fun provideSubscriptionApi(): SubscriptionApi {
+        return MockSubscriptionService()
     }
 }
