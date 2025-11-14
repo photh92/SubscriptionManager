@@ -12,4 +12,13 @@
 /captures
 .externalNativeBuild
 .cxx
+.idea/
+.gradle/
 local.properties
+
+# Builds
+build/
+app/build/
+
+# Logs and generated files
+*.log
