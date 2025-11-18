@@ -32,6 +32,26 @@ class SubscriptionListViewModel @Inject constructor(
         loadSubscriptions()
     }
 
+    /**
+     * UI 테스트를 위한 더미 데이터 추가 이벤트 핸들러
+     */
+    fun onAddDummySubscription() {
+        val dummySubscription = Subscription(
+            id = System.currentTimeMillis().toString(), // 임시 ID
+            name = "Test Subscription ${state.value.subscriptions.size + 1}",
+            cost = 9.99 * (state.value.subscriptions.size + 1),
+            cycle = if (state.value.subscriptions.size % 2 == 0) "MONTHLY" else "YEARLY",
+            firstBillingDate = java.time.LocalDate.now().plusDays(5),
+            currency = "KRW",
+            isActive = true
+        )
+
+        // UseCase를 호출
+        viewModelScope.launch {
+            addSubscriptionUseCase(dummySubscription)
+        }
+    }
+
     private fun loadSubscriptions() {
         // 로딩 상태를 먼저 업데이트
         _state.update { it.copy(isLoading = true, error = null) }
