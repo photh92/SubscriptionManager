@@ -52,7 +52,7 @@ class SubscriptionRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             // 4. [오류 처리]
             // API 통신 실패 시: 로컬에 저장된 항목을 '전송 실패' 또는 '대기 중' 상태로 표시하고,
-            // 나중에 재시도 로직(Day 9의 Refresh/Sync 로직)이 처리하도록 남겨둡니다.
+            // 나중에 재시도 로직(Refresh/Sync 로직)이 처리하도록 남겨둡니다.
             // 현재는 간단히 에러를 던지거나 로깅합니다.
             // localDao.markAsPendingSync(subscription.id)
             throw e
