@@ -19,6 +19,9 @@ data class SubscriptionListState(
     // 전체 구독 비용 합계 등 파생된 정보
     val totalCost: Double = 0.0,
 
+    // Dialog 표시 상태 추가
+    val isAddDialogVisible: Boolean = false,
+
     // 성공 메시지
     val successMessage: String? = null
 )

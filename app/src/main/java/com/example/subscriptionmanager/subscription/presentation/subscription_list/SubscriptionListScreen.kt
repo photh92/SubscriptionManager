@@ -33,14 +33,26 @@ fun SubscriptionListScreen(
         floatingActionButton = {
             // 구독 추가 FAB
             FloatingActionButton(onClick = {
-                // TODO: 팝업 또는 새 화면으로 이동 로직
+                viewModel.showAddDialog() // ViewModel 함수 호출
+
                 // 현재는 테스트용 더미 데이터 추가 함수 호출 (ViewModel에 함수 정의 필요)
-                viewModel.onAddDummySubscription()
+//                viewModel.onAddDummySubscription()
             }) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Subscription")
             }
         }
     ) { paddingValues ->
+
+        // 상태에 따라 다이얼로그 표시
+        if (state.isAddDialogVisible) {
+            AddSubscriptionDialog(
+                onDismiss = viewModel::dismissAddDialog,
+                onConfirm = { name, cost ->
+                    // TODO: 입력받은 데이터를 Domain Model로 변환하여 viewModel.onAddSubscription() 호출
+                    viewModel.dismissAddDialog()
+                }
+            )
+        }
 
         Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
 
@@ -154,4 +166,32 @@ fun SubscriptionListItem(
             }
         }
     }
+}
+
+@Composable
+fun AddSubscriptionDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String, Double) -> Unit // 임시로 이름과 비용만 받는다고 가정
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Add New Subscription") },
+        text = {
+            // TODO: 입력 필드 (TextField, Dropdown) 구현
+            Text("Subscription form goes here...")
+        },
+        confirmButton = {
+            Button(onClick = {
+                // 임시로 더미 데이터 전달 후 확인
+                onConfirm("Dummy", 0.0)
+            }) {
+                Text("Add")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }

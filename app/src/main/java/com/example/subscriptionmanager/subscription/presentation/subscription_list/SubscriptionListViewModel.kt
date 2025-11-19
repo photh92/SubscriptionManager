@@ -128,4 +128,18 @@ class SubscriptionListViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * 구독 추가 Dialog를 표시
+     */
+    fun showAddDialog() {
+        _state.update { it.copy(isAddDialogVisible = true) }
+    }
+
+    /**
+     * 구독 추가 Dialog를 숨김
+     */
+    fun dismissAddDialog() {
+        _state.update { it.copy(isAddDialogVisible = false) }
+    }
 }
