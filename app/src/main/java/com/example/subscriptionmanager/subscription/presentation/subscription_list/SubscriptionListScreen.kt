@@ -4,17 +4,20 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.subscriptionmanager.subscription.domain.model.Subscription
+import java.time.LocalDate
+import java.util.UUID
 
 /**
  * 구독 목록을 표시하는 메인 화면 Composable.
@@ -47,9 +50,20 @@ fun SubscriptionListScreen(
         if (state.isAddDialogVisible) {
             AddSubscriptionDialog(
                 onDismiss = viewModel::dismissAddDialog,
-                onConfirm = { name, cost ->
-                    // TODO: 입력받은 데이터를 Domain Model로 변환하여 viewModel.onAddSubscription() 호출
-                    viewModel.dismissAddDialog()
+                onConfirm = { name, cost, cycle ->
+                    // [Day 9] 입력 데이터를 Domain Model로 변환
+                    val newSubscription = Subscription(
+                        id = UUID.randomUUID().toString(), // 임시 고유 ID 생성
+                        name = name,
+                        cost = cost,
+                        cycle = cycle,
+                        firstBillingDate = LocalDate.now(), // 현재 날짜로 설정
+                        currency = "KRW",
+                        isActive = true
+                    )
+                    // ViewModel의 Add 이벤트 핸들러 호출
+                    viewModel.onAddSubscription(newSubscription)
+                    viewModel.dismissAddDialog() // 다이얼로그 닫기
                 }
             )
         }
@@ -171,27 +185,49 @@ fun SubscriptionListItem(
 @Composable
 fun AddSubscriptionDialog(
     onDismiss: () -> Unit,
-    onConfirm: (String, Double) -> Unit // 임시로 이름과 비용만 받는다고 가정
+    onConfirm: (name: String, cost: Double, cycle: String) -> Unit // 입력 인자 확장
 ) {
+    var nameInput by remember { mutableStateOf("") }
+    var costInput by remember { mutableStateOf("") }
+    var cycleInput by remember { mutableStateOf("MONTHLY") } // 기본값
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Add New Subscription") },
         text = {
-            // TODO: 입력 필드 (TextField, Dropdown) 구현
-            Text("Subscription form goes here...")
+            Column {
+                OutlinedTextField( // 이름 입력 필드
+                    value = nameInput,
+                    onValueChange = { nameInput = it },
+                    label = { Text("Subscription Name") }
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField( // 비용 입력 필드
+                    value = costInput,
+                    onValueChange = { costInput = it.filter { c -> c.isDigit() || c == '.' } }, // 숫자만 허용
+                    label = { Text("Cost") }
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                // 간단한 주기를 선택하는 드롭다운 (현재는 Text로 대체)
+                Text("Cycle: $cycleInput", modifier = Modifier.clickable {
+                    cycleInput = if (cycleInput == "MONTHLY") "YEARLY" else "MONTHLY"
+                })
+            }
         },
         confirmButton = {
-            Button(onClick = {
-                // 임시로 더미 데이터 전달 후 확인
-                onConfirm("Dummy", 0.0)
-            }) {
+            // 유효성 검사 (이름과 비용이 비어있지 않고 비용이 Double로 변환 가능한지)
+            val costDouble = costInput.toDoubleOrNull()
+            val isValid = nameInput.isNotBlank() && costDouble != null
+
+            Button(
+                onClick = { onConfirm(nameInput, costDouble!!, cycleInput) },
+                enabled = isValid
+            ) {
                 Text("Add")
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Cancel")
-            }
+            Button(onClick = onDismiss) { Text("Cancel") }
         }
     )
 }

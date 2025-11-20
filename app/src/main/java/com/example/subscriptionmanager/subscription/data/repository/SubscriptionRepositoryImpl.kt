@@ -75,8 +75,27 @@ class SubscriptionRepositoryImpl @Inject constructor(
         remoteApi.deleteSubscription(subscriptionId)
     }
 
-    // Mock API에서 데이터를 가져와 로컬 DB를 덮어쓰는 동기화 로직
+    /**
+     * 원격 데이터를 가져와 로컬 DB를 동기화하는 로직
+     */
     override suspend fun refreshSubscriptions() {
-        // 현재는 비어있음. 구현 예정
+        try {
+            // Mock API에서 모든 구독 목록(DTOs)을 가져옴
+            val remoteSubscriptions = remoteApi.getAllSubscriptions()
+
+            // DTOs를 Entity로 변환
+            val entities = remoteSubscriptions.map { it.toEntity() }
+
+            // 로컬 DB의 모든 데이터를 지우고 (혹은 스마트하게 비교) 새 데이터로 덮어씀
+            // 우리는 간단하게 모든 데이터를 교체하는 전략을 사용
+            localDao.deleteAllAndInsertAll(entities)
+
+        } catch (e: Exception) {
+            // API 호출 실패 시 로깅하거나 오류 처리
+            println("Error refreshing subscriptions: ${e.message}")
+            // 데이터는 Flow를 통해 로컬 DB의 이전 데이터를 계속 보여주므로 UI는 깨지지 않음
+            throw e
+        }
     }
+
 }

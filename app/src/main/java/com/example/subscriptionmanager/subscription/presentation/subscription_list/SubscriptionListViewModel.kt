@@ -6,6 +6,7 @@ import com.example.subscriptionmanager.subscription.domain.model.Subscription
 import com.example.subscriptionmanager.subscription.domain.usecase.AddSubscriptionUseCase
 import com.example.subscriptionmanager.subscription.domain.usecase.DeleteSubscriptionUseCase
 import com.example.subscriptionmanager.subscription.domain.usecase.GetSubscriptionsUseCase
+import com.example.subscriptionmanager.subscription.domain.usecase.RefreshSubscriptionsUseCase
 import com.example.subscriptionmanager.subscription.domain.usecase.UpdateSubscriptionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -21,7 +22,8 @@ class SubscriptionListViewModel @Inject constructor(
     // 새로 추가된 UseCase들을 주입받음
     private val addSubscriptionUseCase: AddSubscriptionUseCase,
     private val updateSubscriptionUseCase: UpdateSubscriptionUseCase,
-    private val deleteSubscriptionUseCase: DeleteSubscriptionUseCase
+    private val deleteSubscriptionUseCase: DeleteSubscriptionUseCase,
+    private val refreshSubscriptionsUseCase: RefreshSubscriptionsUseCase
 ) : ViewModel() {
 
     // [핵심] UI 상태를 외부로 노출하는 StateFlow
@@ -29,7 +31,17 @@ class SubscriptionListViewModel @Inject constructor(
     val state: StateFlow<SubscriptionListState> = _state.asStateFlow()
 
     init {
-        loadSubscriptions()
+        // 앱 시작 시, 로컬 구독 목록 로드 전에 동기화 작업 시도
+        viewModelScope.launch {
+            try {
+                refreshSubscriptionsUseCase() // 서버 데이터 동기화
+            } catch (e: Exception) {
+                // 동기화 실패는 에러로 간주하지 않고 로깅만 하고 로컬 데이터 로드를 계속함
+                println("Initial sync failed: ${e.message}")
+            } finally {
+                loadSubscriptions() // 로드 함수는 이제 로컬 DB만 바라봄
+            }
+        }
     }
 
     /**
