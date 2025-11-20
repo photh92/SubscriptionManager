@@ -17,7 +17,7 @@ interface SubscriptionApi {
      * 구독 목록을 조회합니다.
      */
     @GET("subscriptions")
-    suspend fun getSubscriptionList(): SubscriptionListResponse
+    suspend fun getAllSubscriptions(): List<SubscriptionDto> // 👈 메서드 이름도 명확하게 변경
 
     /**
      * 새로운 구독을 추가합니다.

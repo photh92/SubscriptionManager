@@ -58,12 +58,9 @@ class MockSubscriptionService : SubscriptionApi {
     /**
      * 구독 목록 조회 (Read)
      */
-    override suspend fun getSubscriptionList(): SubscriptionListResponse {
-        mockDelay()
-        return SubscriptionListResponse(
-            subscriptions = mockSubscriptions.toList(),
-            totalCount = mockSubscriptions.size
-        )
+    override suspend fun getAllSubscriptions(): List<SubscriptionDto> {
+        delay(500) // 네트워크 지연 효과
+        return mockSubscriptions.toList()
     }
 
     /**
