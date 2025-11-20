@@ -1,3 +1,5 @@
+package com.example.subscriptionmanager
+
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
