@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.example.subscriptionmanager.subscription.data.local.entity.SubscriptionEntity
 import kotlinx.coroutines.flow.Flow
@@ -41,4 +42,14 @@ interface SubscriptionDao {
     // 전체 데이터 삭제 (테스트 또는 초기화 시 사용)
     @Query("DELETE FROM subscriptions")
     suspend fun clearAll()
+
+    /**
+     * 전체 데이터를 삭제하고 새 목록을 삽입하는 트랜잭션 메서드.
+     * @Transaction 애노테이션은 두 쿼리가 모두 성공하거나 모두 실패하도록 보장합니다.
+     */
+    @Transaction
+    suspend fun deleteAllAndInsertAll(subscriptions: List<SubscriptionEntity>) {
+        clearAll()
+        insertAll(subscriptions)
+    }
 }
