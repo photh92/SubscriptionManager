@@ -1,5 +1,8 @@
 package com.example.subscriptionmanager.subscription.data.repository
 
+import com.example.subscriptionmanager.common.data.network.error.ApiException
+import com.example.subscriptionmanager.common.data.network.error.NetworkError
+import com.example.subscriptionmanager.common.data.network.error.toNetworkError
 import com.example.subscriptionmanager.subscription.data.local.dao.SubscriptionDao
 import com.example.subscriptionmanager.subscription.data.remote.api.SubscriptionApi
 import com.example.subscriptionmanager.subscription.domain.model.Subscription
@@ -7,8 +10,10 @@ import com.example.subscriptionmanager.subscription.domain.repository.Subscripti
 import com.example.subscriptionmanager.subscription.data.repository.mapper.toDomain
 import com.example.subscriptionmanager.subscription.data.repository.mapper.toDto
 import com.example.subscriptionmanager.subscription.data.repository.mapper.toEntity
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -17,7 +22,8 @@ import javax.inject.Inject
  */
 class SubscriptionRepositoryImpl @Inject constructor(
     private val localDao: SubscriptionDao,
-    private val remoteApi: SubscriptionApi
+    private val remoteApi: SubscriptionApi,
+    private val ioDispatcher: CoroutineDispatcher // Hilt에서 주입받는다고 가정
 ) : SubscriptionRepository {
 
     // 로컬 DB Flow를 Domain Model Flow로 매핑하여 반환
@@ -29,17 +35,17 @@ class SubscriptionRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addSubscription(subscription: Subscription) {
-        // 1. [로컬 저장 - 임시 ID 사용]
+        // 로컬 저장 - 임시 ID 사용
         // Domain Model이 가진 ID (임시 ID 또는 null)를 사용하여 Entity로 변환하고 로컬 DB에 저장합니다.
         localDao.insert(subscription.toEntity())
 
         try {
-            // 2. [API 통신 및 서버 ID 수신]
+            // API 통신 및 서버 ID 수신
             // DTO를 서버로 전송합니다. 서버는 이 데이터를 DB에 저장하고,
             // 최종적으로 부여된 서버 ID를 포함한 DTO를 응답으로 돌려줍니다.
             val remoteDto = remoteApi.addSubscription(subscription.toDto())
 
-            // 3. [로컬 업데이트 - 최종 서버 ID로 갱신]
+            // 로컬 업데이트 - 최종 서버 ID로 갱신
             remoteDto.id?.let { finalServerId ->
                 // 서버에서 받은 최종 ID로 로컬 Entity를 업데이트합니다.
                 // (Mapper를 통해 DTO -> Entity로 변환하여 업데이트)
@@ -50,7 +56,7 @@ class SubscriptionRepositoryImpl @Inject constructor(
                 // localId가 아닌 remoteId를 기준으로 업데이트 할 수 있어야 합니다.
             }
         } catch (e: Exception) {
-            // 4. [오류 처리]
+            // 오류 처리
             // API 통신 실패 시: 로컬에 저장된 항목을 '전송 실패' 또는 '대기 중' 상태로 표시하고,
             // 나중에 재시도 로직(Refresh/Sync 로직)이 처리하도록 남겨둡니다.
             // 현재는 간단히 에러를 던지거나 로깅합니다.
@@ -79,22 +85,28 @@ class SubscriptionRepositoryImpl @Inject constructor(
      * 원격 데이터를 가져와 로컬 DB를 동기화하는 로직
      */
     override suspend fun refreshSubscriptions() {
-        try {
-            // Mock API에서 모든 구독 목록(DTOs)을 가져옴
-            val remoteSubscriptions = remoteApi.getAllSubscriptions()
+        withContext(ioDispatcher) {
+            try {
+                // Mock API 호출 (AuthInterceptor, ErrorInterceptor 작동)
+                val dtos = remoteApi.getAllSubscriptions()
 
-            // DTOs를 Entity로 변환
-            val entities = remoteSubscriptions.map { it.toEntity() }
+                // DTO를 Entity로 변환
+                val entities = dtos.map { it.toEntity() }
 
-            // 로컬 DB의 모든 데이터를 지우고 (혹은 스마트하게 비교) 새 데이터로 덮어씀
-            // 우리는 간단하게 모든 데이터를 교체하는 전략을 사용
-            localDao.deleteAllAndInsertAll(entities)
+                // 로컬 DB에 동기화
+                localDao.deleteAllAndInsertAll(entities)
 
-        } catch (e: Exception) {
-            // API 호출 실패 시 로깅하거나 오류 처리
-            println("Error refreshing subscriptions: ${e.message}")
-            // 데이터는 Flow를 통해 로컬 DB의 이전 데이터를 계속 보여주므로 UI는 깨지지 않음
-            throw e
+            } catch (e: ApiException) {
+                // API 통신 에러 발생 시
+                // Log.e("Repo", "API Error: ${e.code}, ${e.message}")
+                // Domain Layer의 NetworkError로 변환하여 던짐
+                throw e.toNetworkError()
+            } catch (e: Exception) {
+                // 그 외 예외 (JSON 파싱 에러, IOException 등)
+                // Log.e("Repo", "General Error: ${e.message}")
+                // 일반적인 UnknownError로 변환하여 던짐
+                throw NetworkError.UnknownError(e.message ?: "알 수 없는 오류 발생")
+            }
         }
     }
 

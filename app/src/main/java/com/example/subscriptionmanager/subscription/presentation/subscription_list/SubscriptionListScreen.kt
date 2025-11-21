@@ -53,7 +53,7 @@ fun SubscriptionListScreen(
             AddSubscriptionDialog(
                 onDismiss = viewModel::dismissAddDialog,
                 onConfirm = { name, cost, cycle ->
-                    // [Day 9] 입력 데이터를 Domain Model로 변환
+                    // 입력 데이터를 Domain Model로 변환
                     val newSubscription = Subscription(
                         id = UUID.randomUUID().toString(), // 임시 고유 ID 생성
                         name = name,
