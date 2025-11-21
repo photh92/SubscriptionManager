@@ -9,7 +9,7 @@ import javax.inject.Inject
  */
 class AuthInterceptor @Inject constructor() : Interceptor {
 
-    // 실제 앱에서는 SharedPreferences나 DataStore에서 토큰을 가져와야 합니다.
+    // 실제 앱에서는 SharedPreferences나 DataStore에서 토큰을 가져와야 함
     private val authToken = "Bearer mock_auth_token_12345"
 
     override fun intercept(chain: Interceptor.Chain): Response {

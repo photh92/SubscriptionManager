@@ -14,16 +14,16 @@ data class ApiException(
  */
 sealed class NetworkError : Exception() { // NetworkError 자체도 Exception을 상속받도록 정의 가능
 
-    // [수정] Unauthorized는 Exception을 상속
+    // Unauthorized는 Exception을 상속
     data class Unauthorized(val msg: String = "인증 실패 (401)") : NetworkError()
 
-    // [수정] ServerError는 Exception을 상속
+    // ServerError는 Exception을 상속
     data class ServerError(val msg: String = "서버 오류 발생") : NetworkError()
 
-    // [수정] UnknownError는 Exception을 상속
+    // UnknownError는 Exception을 상속
     data class UnknownError(val msg: String = "알 수 없는 네트워크 오류") : NetworkError()
 
-    // 예시: toString()을 오버라이드하여 로그에 메시지가 잘 나오도록 할 수 있습니다.
+    // toString()을 오버라이드하여 로그에 메시지가 잘 나오도록 할 수 있습니다.
     override val message: String
         get() = when (this) {
             is Unauthorized -> this.msg

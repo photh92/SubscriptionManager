@@ -23,7 +23,7 @@ import javax.inject.Inject
 class SubscriptionRepositoryImpl @Inject constructor(
     private val localDao: SubscriptionDao,
     private val remoteApi: SubscriptionApi,
-    private val ioDispatcher: CoroutineDispatcher // Hilt에서 주입받는다고 가정
+    private val ioDispatcher: CoroutineDispatcher
 ) : SubscriptionRepository {
 
     // 로컬 DB Flow를 Domain Model Flow로 매핑하여 반환
