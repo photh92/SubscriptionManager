@@ -93,11 +93,6 @@ class SubscriptionListViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    // UI 이벤트 처리를 위한 함수
-    fun onSubscriptionClicked(subscriptionId: String) {
-        // navigation logic
-    }
-
     /**
      * 구독 추가 이벤트 처리
      */

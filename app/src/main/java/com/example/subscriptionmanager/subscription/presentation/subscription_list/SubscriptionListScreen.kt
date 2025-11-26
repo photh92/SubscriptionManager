@@ -28,7 +28,10 @@ import java.util.UUID
 @Composable
 fun SubscriptionListScreen(
     // Hilt를 사용하여 ViewModel을 제공받음
-    viewModel: SubscriptionListViewModel = hiltViewModel()
+    viewModel: SubscriptionListViewModel = hiltViewModel(),
+    onNavigateToAdd: () -> Unit,
+    // 아이템 클릭 시 편집 화면으로 이동할 네비게이션 콜백
+    onNavigateToEdit: (String) -> Unit // 편집할 ID를 인자로 받음
 ) {
     // ViewModel의 StateFlow를 Composable 상태로 관찰 (Recomposition 트리거)
     val state by viewModel.state.collectAsState()
@@ -37,12 +40,7 @@ fun SubscriptionListScreen(
         topBar = { TopAppBar(title = { Text("My Subscriptions") }) },
         floatingActionButton = {
             // 구독 추가 FAB
-            FloatingActionButton(onClick = {
-                viewModel.showAddDialog() // ViewModel 함수 호출
-
-                // 현재는 테스트용 더미 데이터 추가 함수 호출 (ViewModel에 함수 정의 필요)
-//                viewModel.onAddDummySubscription()
-            }) {
+            FloatingActionButton(onClick = onNavigateToAdd) { // FAB 클릭 시 네비게이션 콜백 호출
                 Icon(Icons.Filled.Add, contentDescription = "Add Subscription")
             }
         }
@@ -91,7 +89,7 @@ fun SubscriptionListScreen(
             else {
                 SubscriptionList(
                     subscriptions = state.subscriptions,
-                    onItemClick = viewModel::onSubscriptionClicked // 이벤트 핸들러
+                    onItemClick = onNavigateToEdit // 이벤트 핸들러
                 )
             }
         }
