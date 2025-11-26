@@ -34,6 +34,17 @@ class SubscriptionRepositoryImpl @Inject constructor(
             }
     }
 
+    override suspend fun getSubscriptionById(id: String): Subscription? {
+        // 특정 ID를 가진 구독 정보를 로컬 DB에서 조회
+        return withContext(ioDispatcher) {
+            // 로컬 DAO에서 엔티티를 조회
+            val entity = localDao.getSubscriptionById(id)
+
+            // 엔티티가 존재하면 Domain Model로 매핑하여 반환, 없으면 null 반환
+            entity?.toDomain()
+        }
+    }
+
     override suspend fun addSubscription(subscription: Subscription) {
         // 로컬 저장 - 임시 ID 사용
         // Domain Model이 가진 ID (임시 ID 또는 null)를 사용하여 Entity로 변환하고 로컬 DB에 저장합니다.

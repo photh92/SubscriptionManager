@@ -12,6 +12,9 @@ interface SubscriptionRepository {
     // 전체 구독 목록 조회 (로컬/원격 데이터를 통합하여 제공)
     fun getAllSubscriptions(): Flow<List<Subscription>>
 
+    // 특정 ID의 구독을 가져옴 (편집 기능용)
+    suspend fun getSubscriptionById(id: String): Subscription?
+
     // 구독 추가
     suspend fun addSubscription(subscription: Subscription)
 
